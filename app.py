@@ -10,7 +10,7 @@ st.set_page_config(page_title="商品图工作室", layout="wide")  # 宽屏
 nav = st.navigation(
     [
         st.Page("pages_build.py", title="搭建配置", icon=":material/tune:", default=True),
-        st.Page("pages_test.py", title="商品图工作室", icon=":material/photo_camera:"),
+        st.Page("pages_studio.py", title="商品图工作室", icon=":material/photo_camera:", url_path="studio"),
     ],
     position="top",  # 页面切换放在左上角
 )

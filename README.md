@@ -52,8 +52,6 @@ flowchart TD
 | 方案 Agent `psd_proposal_agent` | 将商品信息与用户需求变成拍摄方案 | 纯文本生成，不挂载图片工具 |
 | 生成 Agent `psd_generate_agent` | 将方案写成具体提示词，逐张生成图片 | 仅 `generate_scene_image` |
 
-`agents/商品图助手.json` 是一个较小的演示配置，不在默认主流程中。
-
 ## 运行时是怎样工作的
 
 主流程在 [engine.py](engine.py)，可以按下面的顺序阅读。
@@ -108,8 +106,6 @@ python -m streamlit run app.py
 
 打开 `http://localhost:8501`，选择顶部的「商品图工作室」进入对话；「搭建配置」用于查看和修改 Agent 模型、提示词、工具与上下级关系。
 
-macOS 也可以双击 `启动面板.command`。如果还没有 `config.py`，脚本会先生成一份空配置并提示填写，不会覆盖已有配置。
-
 Windows 可以使用 `py -m venv .venv`、`.venv\Scripts\Activate.ps1` 和 `Copy-Item config.example.py config.py`，其余 Python 命令相同。
 
 ### 跑一个最小例子
@@ -125,7 +121,7 @@ Windows 可以使用 `py -m venv .venv`、`.venv\Scripts\Activate.ps1` 和 `Copy
 
 ```text
 app.py                  Streamlit 入口与双页面导航
-pages_test.py           用户对话、进度、最终图片与失败补图
+pages_studio.py           用户对话、进度、最终图片与失败补图
 pages_build.py          Agent 配置与提示词编辑
 engine.py               模型调用、工具执行、上下文与 Agent 移交
 chat_support.py         上传校验、图片路径及最终产物过滤
@@ -136,12 +132,10 @@ prompts/                各角色的系统提示词
 tools/                  实际执行识别、抠图、提问和生图的函数
 tool_list.json          发给模型的工具 JSON Schema
 config.example.py       空凭证配置模板
-tests/                 不依赖付费接口的回归测试
-scripts/check_secrets.py 发布前的凭证与敏感文件检查
 docs/images/            README 使用的界面和结果图片
 ```
 
-推荐阅读顺序：`agents/product_scene_design_agent.json` → 对应提示词 → `engine.run_agent()` → `tools/ask_human.py` → 生图工具 → `pages_test.py`。
+推荐阅读顺序：`agents/product_scene_design_agent.json` → 对应提示词 → `engine.run_agent()` → `tools/ask_human.py` → 生图工具 → `pages_studio.py`。
 
 ## 三个适合练习的扩展
 
@@ -163,26 +157,20 @@ docs/images/            README 使用的界面和结果图片
 
 这个练习比一开始就增加 Agent 数量更容易帮助你理解运行时的边界。
 
-## 测试与凭证检查
+## 配置与运行文件
 
-复制配置模板后，可以在不填写真实 Key 的情况下运行离线回归测试：
+仓库仅保留运行电商助手需要的代码、Agent 配置、提示词、空配置模板，以及 README 使用的两张图片。不包含测试目录、样例输入、旧需求文档、试跑脚本或桌面启动器。
 
-```bash
-python -m unittest discover -s tests -v
-```
+`config.py`、`.env`、`.streamlit/secrets.toml`、`.runtime/`、用户上传及 `输出/` 不应提交。运行时会按需创建上传和输出目录，无需预先放入测试图片。
 
-测试使用 Mock 模拟外部接口，覆盖工具记录完整性、移交、暂时性错误重试、失败任务补图、抠图隐藏和 Seedream 请求格式；它们不证明外部服务始终可用。
-
-发布前先暂存要提交的文件，再检查 Git 暂存区与历史：
+可以先做一次语法检查，再启动界面：
 
 ```bash
-git add README.md config.example.py  # 按实际修改选择要提交的文件
-python scripts/check_secrets.py --staged --history
+python -m compileall -q app.py engine.py chat_support.py network.py diagnostics.py pages_build.py pages_studio.py tools
+python -m streamlit run app.py
 ```
 
-检查器会检查敏感文件名、常见凭证格式，以及本地配置中的已知凭证是否出现在待发布内容中；只报告文件和原因，不打印凭证。它是辅助检查，不能代替人工审阅。
-
-`config.py`、`.env`、`.streamlit/secrets.toml`、`.runtime/`、用户上传及 `输出/` 均不应提交。截图专门放在 `docs/images/`，不需要把整个输出目录公开。
+「商品图工作室」的地址是 `http://localhost:8501/studio`。使用自己的商品图片即可开始，最终图片会保存在本地 `输出/` 目录。
 
 ## 当前边界
 
