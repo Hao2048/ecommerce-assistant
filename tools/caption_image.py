@@ -9,15 +9,13 @@
 import base64
 import json
 import mimetypes
-from pathlib import Path
 
 from openai import OpenAI
 
-import config
+from settings import config
 from chat_support import local_image
 from network import http_client
 
-ROOT = Path(__file__).resolve().parent.parent
 
 PROMPT = (
     "看这张图，判断里面有没有明确的商品主体（忽略文字和水印，忽略背景）。"
@@ -33,7 +31,7 @@ def run(image_path=""):
             return {"ok": False, "error": "image_path 必填，如 样图/产品.jpg"}
         src = local_image(image_path)
         if not config.DEEPSEEK_API_KEY:
-            return {"ok": False, "error": "请在 config.py 配置 DEEPSEEK_API_KEY"}
+            return {"ok": False, "error": "请在 config/config.py 配置 DEEPSEEK_API_KEY"}
 
         image_b64 = base64.b64encode(src.read_bytes()).decode("utf-8")
         mime = mimetypes.guess_type(str(src))[0] or "image/jpeg"

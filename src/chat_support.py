@@ -6,7 +6,7 @@ from uuid import uuid4
 
 from PIL import Image, ImageOps, UnidentifiedImageError
 
-ROOT = Path(__file__).resolve().parent
+from project_paths import ROOT
 MAX_UPLOAD_BYTES = 20 * 1024 * 1024
 
 

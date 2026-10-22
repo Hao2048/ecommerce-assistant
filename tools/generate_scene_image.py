@@ -8,17 +8,16 @@ import base64
 import io
 import ssl
 import time
-from pathlib import Path
 from uuid import uuid4
 
 import httpx
 from PIL import Image
 
-import config
+from settings import config
 from chat_support import local_image
 from network import http_client
 
-ROOT = Path(__file__).resolve().parent.parent
+from project_paths import ROOT
 RATIO_SIZES = {
     '1:1': '2048x2048', '3:4': '1536x2048', '4:3': '2048x1536',
     '9:16': '1440x2560', '16:9': '2560x1440',
@@ -60,7 +59,7 @@ def run(image_path='', prompt='', aspect_ratio='1:1'):
         if not isinstance(aspect_ratio, str) or aspect_ratio not in RATIO_SIZES:
             return {'ok': False, 'error': 'aspect_ratio 只支持 ' + ' / '.join(ALLOW_RATIOS)}
         if not config.ARK_API_KEY:
-            return {'ok': False, 'error': '请在 config.py 配置 ARK_API_KEY'}
+            return {'ok': False, 'error': '请在 config/config.py 配置 ARK_API_KEY'}
         src = local_image(image_path)
         buffer = io.BytesIO()
         with Image.open(src) as product:

@@ -24,3 +24,6 @@ config.local.py
 *.key
 .pytest_cache/
 .coverage
+
+# Local credentials (never publish)
+/config/config.py

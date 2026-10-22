@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Agent 运行时：工具调用、分层移交、对话记录与有界重试。
 
-用法（试跑.py 或未来的页面都这样调）:
+用法（从 src 下的页面调用）:
     from engine import run_agent
     reply = run_agent("agent名", messages, on_event)
 """
@@ -10,16 +10,15 @@ import json
 import logging
 import re
 import time
-from pathlib import Path
 
 import openai
 
-import config
+from settings import config
 from network import http_client
 from diagnostics import record_failure
 from chat_support import image_artifacts, generation_task_key
 
-ROOT = Path(__file__).resolve().parent
+from project_paths import ROOT, TOOL_SPECS
 AGENTS_DIR = ROOT / "agents"
 MAX_ROUNDS = 24  # 模型最多连续调 Tool 的圈数
 MAX_RETRIES = 3  # 模型网络错误/5xx 的重试次数
@@ -68,7 +67,7 @@ def _load_agent(agent_name):
 
 
 def _load_tool_specs(function_names):
-    all_tools = json.loads((ROOT / "tool_list.json").read_text(encoding="utf-8"))
+    all_tools = json.loads(TOOL_SPECS.read_text(encoding="utf-8"))
     specs = {t["function"]["name"]: t for t in all_tools}
     missing = [n for n in function_names if n not in specs]
     if missing:
@@ -176,7 +175,7 @@ def run_agent(agent_name, messages, on_event=None, _depth=0):
       参数只有 task），调用时用下属自己的配置跑完整循环。
     """
     if not config.DEEPSEEK_API_KEY:
-        raise ValueError("请先在 config.py 配置 DEEPSEEK_API_KEY")
+        raise ValueError("请先在 config/config.py 配置 DEEPSEEK_API_KEY")
     agent = _load_agent(agent_name)
     tools = _load_tool_specs(agent["functionNames"])
     for sub_name in agent.get("hierarchies") or []:  # 下属 Agent 自动成为移交工具

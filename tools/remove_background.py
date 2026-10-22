@@ -12,14 +12,13 @@ import json
 from uuid import uuid4
 import io
 from PIL import Image
-from pathlib import Path
 
 import requests
 
-import config
+from settings import config
 from chat_support import local_image
 
-ROOT = Path(__file__).resolve().parent.parent
+from project_paths import ROOT
 API_URL = "https://api.pixian.ai/api/v2/remove-background"
 
 
@@ -29,7 +28,7 @@ def run(image_path=""):
             return {"ok": False, "error": "image_path 必填，如 样图/产品.jpg"}
         src = local_image(image_path)
         if not config.PIXIAN_API_ID or not config.PIXIAN_API_SECRET:
-            return {"ok": False, "error": "未配置 Pixian 凭证，请在 config.py 里填写 PIXIAN_API_ID 和 PIXIAN_API_SECRET"}
+            return {"ok": False, "error": "未配置 Pixian 凭证，请在 config/config.py 里填写 PIXIAN_API_ID 和 PIXIAN_API_SECRET"}
 
         with open(src, "rb") as f:
             resp = requests.post(

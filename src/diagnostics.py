@@ -2,11 +2,10 @@
 import json
 import logging
 from logging.handlers import RotatingFileHandler
-from pathlib import Path
 
-import config
+from settings import config
 
-ROOT = Path(__file__).resolve().parent
+from project_paths import ROOT
 
 
 def record_failure(agent, tool, result):

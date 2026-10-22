@@ -54,10 +54,10 @@ flowchart TD
 
 ## 运行时是怎样工作的
 
-主流程在 [engine.py](engine.py)，可以按下面的顺序阅读。
+主流程在 [engine.py](src/engine.py)，可以按下面的顺序阅读。
 
 1. **读取角色配置。** 从 `agents/<name>.json` 加载模型、提示词、工具和下属 Agent；提示词可以独立放在 `prompts/`。
-2. **组装工具说明书。** `tool_list.json` 告诉模型每个工具的用途、参数和必填项。挂载工具不等于已经执行工具。
+2. **组装工具说明书。** `config/tool_list.json` 告诉模型每个工具的用途、参数和必填项。挂载工具不等于已经执行工具。
 3. **让模型决定下一步。** 模型可以直接回复，也可以返回一个或多个 `tool_calls`。Python 运行时验证权限、解析参数，再执行实际函数。
 4. **把工具结果写回上下文。** 每个工具调用都有对应的 `tool_call_id` 和结果消息。工具失败也是结构化结果，不能丢失，否则下一轮接口可能拒绝对话记录。
 5. **通过移交工具调用子 Agent。** `hierarchies` 会自动变成 `handoff_to_<name>`。子 Agent 使用自己的提示词和权限，返回回复及最终图片产物。
@@ -86,11 +86,11 @@ git clone https://github.com/Hao2048/ecommerce-assistant.git
 cd ecommerce-assistant
 python3 -m venv .venv
 source .venv/bin/activate
-python -m pip install -r requirements.txt
-cp config.example.py config.py
+python -m pip install -r requirements/requirements.txt
+cp config/config.example.py config/config.py
 ```
 
-在本地 `config.py` 填入自己的凭证。仓库只提供**凭证为空的配置副本** [config.example.py](config.example.py)，不包含真实 `config.py`。
+在本地 `config/config.py` 填入自己的凭证。仓库只提供**凭证为空的配置副本** [config.example.py](config/config.example.py)，不包含真实 `config/config.py`。
 
 | 配置项 | 用途 |
 | --- | --- |
@@ -101,12 +101,12 @@ cp config.example.py config.py
 白底或透明背景图片可以跳过抠图；复杂背景流程需要 Pixian 凭证。填写后启动：
 
 ```bash
-python -m streamlit run app.py
+python -m streamlit run src/app.py
 ```
 
 打开 `http://localhost:8501`，选择顶部的「商品图工作室」进入对话；「搭建配置」用于查看和修改 Agent 模型、提示词、工具与上下级关系。
 
-Windows 可以使用 `py -m venv .venv`、`.venv\Scripts\Activate.ps1` 和 `Copy-Item config.example.py config.py`，其余 Python 命令相同。
+Windows 可以使用 `py -m venv .venv`、`.venv\Scripts\Activate.ps1` 和 `Copy-Item config/config.example.py config/config.py`，其余 Python 命令相同。
 
 ### 跑一个最小例子
 
@@ -120,22 +120,33 @@ Windows 可以使用 `py -m venv .venv`、`.venv\Scripts\Activate.ps1` 和 `Copy
 ## 从哪里开始读代码
 
 ```text
-app.py                  Streamlit 入口与双页面导航
-pages_studio.py           用户对话、进度、最终图片与失败补图
-pages_build.py          Agent 配置与提示词编辑
-engine.py               模型调用、工具执行、上下文与 Agent 移交
-chat_support.py         上传校验、图片路径及最终产物过滤
-network.py              代理与 HTTP 客户端
-diagnostics.py         本地错误日志与凭证脱敏
-agents/                 每个角色的模型、工具和上下级配置
-prompts/                各角色的系统提示词
-tools/                  实际执行识别、抠图、提问和生图的函数
-tool_list.json          发给模型的工具 JSON Schema
-config.example.py       空凭证配置模板
-docs/images/            README 使用的界面和结果图片
+README.md                       项目说明与多 Agent 教程
+LICENSE                         非商用许可证
+.gitignore                      忽略凭证和运行产物
+src/
+  app.py                        Streamlit 入口与双页面导航
+  pages_studio.py                用户对话、进度、最终图片与失败补图
+  pages_build.py                 Agent 配置与提示词编辑
+  engine.py                      模型调用、工具执行、上下文与 Agent 移交
+  chat_support.py                上传校验、图片路径及最终产物过滤
+  network.py                     代理与 HTTP 客户端
+  diagnostics.py                 本地错误日志与凭证脱敏
+  settings.py                    加载配置模板和本地凭证
+  project_paths.py               项目资源路径
+config/
+  config.example.py              空凭证配置模板
+  config.py                      本地凭证（自行创建，Git 忽略）
+  tool_list.json                 发给模型的工具 JSON Schema
+agents/                         每个角色的模型、工具和上下级配置
+prompts/                        各角色的系统提示词
+tools/                          识别、抠图、提问和生图工具
+requirements/requirements.txt   Python 依赖
+.streamlit/config.toml          Streamlit 主题配置
+docs/NOTICE                     版权和授权声明
+docs/images/                    README 使用的界面和结果图片
 ```
 
-推荐阅读顺序：`agents/product_scene_design_agent.json` → 对应提示词 → `engine.run_agent()` → `tools/ask_human.py` → 生图工具 → `pages_studio.py`。
+推荐阅读顺序：`agents/product_scene_design_agent.json` → 对应提示词 → `src/engine.py` 中的 `run_agent()` → `tools/ask_human.py` → 生图工具 → `src/pages_studio.py`。
 
 ## 三个适合练习的扩展
 
@@ -143,7 +154,7 @@ docs/images/            README 使用的界面和结果图片
 
 在 `tools/` 新建模块，提供 `run(**arguments)`，返回可 JSON 序列化的字典。成功返回 `{"ok": true, ...}`，失败返回 `{"ok": false, "error": "原因"}`。
 
-然后在 `tool_list.json` 注册参数说明，并把工具名加入对应 Agent 的 `functionNames`。只写提示词里的工具名不会让工具自动可用。
+然后在 `config/tool_list.json` 注册参数说明，并把工具名加入对应 Agent 的 `functionNames`。只写提示词里的工具名不会让工具自动可用。
 
 ### 2. 新增一个子 Agent
 
@@ -159,15 +170,17 @@ docs/images/            README 使用的界面和结果图片
 
 ## 配置与运行文件
 
+根目录仅保留 README、忽略文件和许可证三个文件。源码位于 `src/`，配置位于 `config/`，依赖位于 `requirements/`，版权声明与展示图片位于 `docs/`。资源路径始终以项目目录为基准，上传和生成结果仍保存在项目目录下。
+
 仓库仅保留运行电商助手需要的代码、Agent 配置、提示词、空配置模板，以及 README 使用的两张图片。不包含测试目录、样例输入、旧需求文档、试跑脚本或桌面启动器。
 
-`config.py`、`.env`、`.streamlit/secrets.toml`、`.runtime/`、用户上传及 `输出/` 不应提交。运行时会按需创建上传和输出目录，无需预先放入测试图片。
+`config/config.py`、`.env`、`.streamlit/secrets.toml`、`.runtime/`、用户上传及 `输出/` 不应提交。运行时会按需创建上传和输出目录，无需预先放入测试图片。
 
 可以先做一次语法检查，再启动界面：
 
 ```bash
-python -m compileall -q app.py engine.py chat_support.py network.py diagnostics.py pages_build.py pages_studio.py tools
-python -m streamlit run app.py
+python -m compileall -q src tools
+python -m streamlit run src/app.py
 ```
 
 「商品图工作室」的地址是 `http://localhost:8501/studio`。使用自己的商品图片即可开始，最终图片会保存在本地 `输出/` 目录。
@@ -178,6 +191,6 @@ python -m streamlit run app.py
 
 ## 许可证：非商用源码开放
 
-本项目采用 [PolyForm Noncommercial License 1.0.0](LICENSE)，用于条款允许的非商用学习、研究、实验、修改和分发。商业使用需另行取得授权，完整条件以 [LICENSE](LICENSE) 和 [NOTICE](NOTICE) 为准。
+本项目采用 [PolyForm Noncommercial License 1.0.0](LICENSE)，用于条款允许的非商用学习、研究、实验、修改和分发。商业使用需另行取得授权，完整条件以 [LICENSE](LICENSE) 和 [NOTICE](docs/NOTICE) 为准。
 
 由于包含非商用限制，本项目属于 source-available（源码开放）项目，不属于 OSI 定义的允许商用的开源许可。第三方服务、依赖、商品品牌及素材的权利仍遵循各自条款。

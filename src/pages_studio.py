@@ -5,7 +5,7 @@ import json
 
 import streamlit as st
 
-import config
+from settings import config
 from chat_support import (clean_reply, error_message, image_artifacts, local_image, save_upload,
                           deliverable_paths, retry_tasks_from_results, generation_task_key)
 from engine import run_agent, retry_scene_tasks

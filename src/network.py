@@ -8,7 +8,7 @@ from urllib.request import getproxies, proxy_bypass
 
 import httpx
 
-import config
+from settings import config
 
 
 def proxy_for(url):

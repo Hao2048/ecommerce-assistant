@@ -9,9 +9,9 @@ from pathlib import Path
 
 import streamlit as st
 
-import config
+from settings import config
 
-ROOT = Path(__file__).resolve().parent
+from project_paths import ROOT, TOOL_SPECS
 AGENTS_DIR = ROOT / "agents"
 MODELS = ["deepseek-flash"]
 
@@ -30,7 +30,7 @@ def write_json(path, data):
 
 
 def tool_names():
-    return [t["function"]["name"] for t in read_json(ROOT / "tool_list.json", [])]
+    return [t["function"]["name"] for t in read_json(TOOL_SPECS, [])]
 
 
 def model_options(current=None):
