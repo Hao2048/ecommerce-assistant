@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>商品场景图多 Agent 系统 · 工作流程思维导图</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: "PingFang SC", "Microsoft YaHei", -apple-system, sans-serif;
+    background: #f7f8fa; color: #202124; padding: 28px 34px 60px;
+  }
+  h1 { font-size: 20px; margin-bottom: 6px; }
+  .legend { font-size: 12.5px; color: #5f6368; margin-bottom: 18px; }
+  .legend b { color: #188038; } .legend i { color: #9334e6; font-style: normal; }
+  ul.tree { list-style: none; padding-left: 26px; margin: 4px 0 4px 10px; border-left: 2px solid #dadce0; }
+  ul.tree > li { position: relative; margin: 7px 0; }
+  ul.tree > li::before {
+    content: ""; position: absolute; left: -26px; top: 15px; width: 22px;
+    border-top: 2px solid #dadce0;
+  }
+  .node {
+    display: inline-flex; align-items: center; gap: 7px;
+    padding: 6px 12px; border-radius: 9px; background: #fff;
+    border: 1.5px solid #dadce0; font-size: 13.5px; line-height: 1.45;
+    box-shadow: 0 1px 2px rgba(60,64,67,.08);
+  }
+  .node.parent { cursor: pointer; user-select: none; }
+  .node .toggle {
+    width: 17px; height: 17px; border-radius: 50%; flex: none;
+    background: #e8eaed; color: #5f6368; font-size: 11px; line-height: 17px;
+    text-align: center; transition: transform .15s;
+  }
+  .node.parent.open .toggle { transform: rotate(90deg); }
+  .node .badge { font-size: 10.5px; padding: 1px 7px; border-radius: 8px; font-weight: 600; }
+  .leaf-note { font-size: 12px; color: #5f6368; }
+  ul.tree.collapsed { display: none; }
+  /* 根节点 */
+  > .rootwrap { margin-bottom: 10px; }
+  .root {
+    display: inline-block; padding: 12px 22px; border-radius: 14px; color: #fff;
+    font-size: 17px; font-weight: 700; letter-spacing: .5px;
+    background: linear-gradient(135deg, #1a73e8, #9334e6);
+    box-shadow: 0 3px 10px rgba(26,115,232,.35);
+  }
+  /* 一级分支 */
+  .lvl1 { font-weight: 700; font-size: 14.5px; color: #fff; border: none; }
+  /* 步骤编号 */
+  .stepno {
+    flex: none; width: 19px; height: 19px; border-radius: 50%; color: #fff;
+    background: #5f6368; font-size: 11.5px; line-height: 19px; text-align: center; font-weight: 700;
+  }
+  code { background: #f1f3f4; border-radius: 4px; padding: 0 4px; font-size: 12px; }
+</style>
+</head>
+<body>
+<h1>商品场景图多 Agent 系统 · 工作流程思维导图</h1>
+<div class="legend">点击 <b>带 ▸ 圆点的节点</b> 可折叠 / 展开　|　<b>✅ 已实现</b>　<i>⬜ 规划中</i></div>
+<div id="map"></div>
+
+<script>
+const DATA = {
+  t: "🎨 商品场景图 · 多 Agent 系统", root: true,
+  children: [
+  { t: "🧠 Agent 层 <span class='badge' style='background:#e8f0fe;color:#1a73e8'>agents/*.json + prompts/*.md</span>", c: "#1a73e8", children: [
+    { t: "🎯 product_scene_design_agent（主管）", children: [
+      "大脑: claude-sonnet-4-5（AiHubMix 接入）",
+      "职责: 看图识商品 → 定拍摄方案 → 向你确认 → 备料 → 调度下属",
+      "工具: caption_image / remove_background / ask_human / 2 个 handoff",
+    ]},
+    { t: "📋 psd_proposal_agent（方案师 · 零工具）", children: [
+      "输出 8 维度关键词组: 环境/装饰/镜头/视角/占比/光影/色调/手法",
+      "默认 8 张 = 纯商品展示 4 子类 + 人机交互 2 子类×2",
+    ]},
+    { t: "🖼️ psd_generate_agent（生成执行）", children: [
+      "工具: generate_scene_image（逐张生成）",
+      "提示词规则: Based on the uploaded image 开头 / 严禁白底白边 / 8K 结尾",
+      "记忆模式 contextOutputMode = none（一次性接任务）",
+    ]},
+    { t: "🔗 hierarchies 移交机制", children: [
+      "下属自动变成 handoff_to_&lt;名&gt; 工具（说明书=下属 description）",
+      "参数只有 task；用下属自己的配置跑完整循环",
+      "控制权回流主管；嵌套 ≤ 3 层",
+    ]},
+  ]},
+  { t: "🔧 Tool 层 <span class='badge' style='background:#e6f4ea;color:#188038'>tools/ + tool_list.json</span>", c: "#188038", children: [
+    { t: "✅ 已实现（三件套: 代码+说明书+测试台测过）", children: [
+      "caption_image → AiHubMix 看图（gpt-4o-mini），判商品主体",
+      "remove_background → Pixian 抠图，透明 PNG",
+      "generate_scene_image → Gemini 生图，5 种比例，5xx/超时重试 3 次",
+      "ask_human → 向用户提问（不调 API，停下等回答由平台负责）",
+    ]},
+    { t: "⬜ 规划中", children: [
+      "planning_generation / planning_status（规划跟踪）",
+      "parallel_tool_invoker（8 张分两批并行生图）",
+      "agent_end_tool（结束信号）",
+    ]},
+    "规约: 只暴露 run() / 永远返回 dict / 绝不抛异常",
+  ]},
+  { t: "🚂 Engine 运行时 <span class='badge' style='background:#fef7e0;color:#e8710a'>engine.py</span>", c: "#e8710a", children: [
+    "run_agent(名, messages, on_event) — 平台唯一入口",
+    "主循环: 模型 ↔ Tool 结果回喂，最多 15 圈（ReAct 式）",
+    "ask_human → 立即停下，问题+选项拼成回复",
+    "网络错误 / 5xx 自动重试 3 次（3s/6s 退避）",
+    "system_prompt 每次临时拼最前 → 页面改了下一句生效",
+    "记忆模式: full=带完整历史 / none=只带最后一条任务",
+    "on_event(名, 工具, 参数, 结果) → 面板实时进度",
+  ]},
+  { t: "🖥️ 面板层 <span class='badge' style='background:#fce8e6;color:#d93025'>Streamlit app.py 顶部导航</span>", c: "#d93025", children: [
+    { t: "🛠️ 搭建面板（给 PM 配置用）", children: [
+      "主 Agent: 名称 / 模型 / Tool 挂载 / System Prompt",
+      "子 Agent 名片 + 弹窗编辑 / ＋新建（自动挂进 hierarchies）",
+      "💾 保存写回 JSON（提示词另存回 prompts/）",
+      "🔄 重新加载防旧页覆盖；改名防覆盖同名；编辑不改变顺序",
+    ]},
+    { t: "💬 测试页面（给用户体验用，纯对话）", children: [
+      "底部输入框 + 「+」上传商品图（存 样图/上传/）",
+      "每个 Tool 调用实时显示一行人话进度",
+      "ask_human 选项变可点按钮；生成图排图片墙、逐张下载",
+    ]},
+  ]},
+  { t: "🗂️ 数据与目录", c: "#12a4af", children: [
+    "输出/ — 生成图片（文件名带时分秒毫秒）",
+    "样图/ — 测试图 + 上传/（用户上传）",
+    "config.py — API Key 与 Tool 模型名唯一存放处",
+    "tool_list.json — 工具说明书（OpenAI function 格式）",
+  ]},
+  { t: "✅ 验收体系", c: "#9334e6", children: [
+    "测试台.py — 逐工具测试（退出码 0/1 可接 CI）",
+    "试跑.py — 终端多轮对话验收 Agent",
+    "Tool清单.md — 每个工具的 ✅ 状态表",
+    "AppTest — 面板无头自动化测试",
+  ]},
+  { t: "🔁 一次完整任务（端到端）", c: "#5f6368", children: [
+    { t: "1. 用户上传商品图 + 文字需求", no: "1" },
+    { t: "2. 主管调 caption_image 看懂商品", no: "2" },
+    { t: "3. ask_human 确认 场景类型/数量/尺寸（不默认 1:1）", no: "3" },
+    { t: "4. remove_background 抠图备料", no: "4" },
+    { t: "5. handoff → 方案师: 输出 8 维度关键词方案", no: "5" },
+    { t: "6. handoff → 生成执行: 写英文提示词逐张生图", no: "6" },
+    { t: "7. 对话里图片墙展示 → 逐张下载", no: "7" },
+    { t: "✳︎ 接入并行工具后: 8 张分两批并行生成", no: "8" },
+  ]},
+]};
+
+function render(node, depth) {
+  if (typeof node === "string") node = { t: node }; // 字符串缩写 → 叶子节点
+  const hasKids = node.children && node.children.length;
+  const li = document.createElement("li");
+  const pill = document.createElement("span");
+  pill.className = "node" + (hasKids ? " parent open" : "");
+  if (node.root) pill.classList.add("root");
+  if (depth === 1) pill.classList.add("lvl1");
+  if (depth === 1) pill.style.background = node.c;
+  if (depth > 1 && node.c) { pill.style.borderColor = node.c; pill.style.borderLeftWidth = "4px"; }
+  if (hasKids) {
+    const tg = document.createElement("span");
+    tg.className = "toggle"; tg.textContent = "▸";
+    pill.appendChild(tg);
+  }
+  if (node.no) {
+    const no = document.createElement("span");
+    no.className = "stepno"; no.textContent = node.no;
+    pill.appendChild(no);
+  }
+  const label = document.createElement("span");
+  label.innerHTML = node.t;
+  pill.appendChild(label);
+  li.appendChild(pill);
+
+  if (hasKids) {
+    const ul = document.createElement("ul");
+    ul.className = "tree";
+    node.children.forEach(kid => ul.appendChild(render(kid, depth + 1)));
+    li.appendChild(ul);
+    pill.addEventListener("click", () => {
+      ul.classList.toggle("collapsed");
+      pill.classList.toggle("open");
+    });
+  }
+  return li;
+}
+
+const rootUl = document.createElement("ul");
+rootUl.className = "tree";
+rootUl.style.borderLeft = "none";
+rootUl.appendChild(render(DATA, 0));
+document.getElementById("map").appendChild(rootUl);
+</script>
+</body>
+</html>

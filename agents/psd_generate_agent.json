@@ -1,0 +1,12 @@
+{
+  "name": "psd_generate_agent",
+  "description": "产品场景图生成执行者：按设计方案关键词组撰写提示词并逐张生成图片，汇报产物路径",
+  "modelName": "deepseek-flash",
+  "functionNames": [
+    "generate_scene_image"
+  ],
+  "mcpServerList": {},
+  "contextOutputMode": "none",
+  "hierarchies": [],
+  "system_prompt_file": "prompts/psd_generate_agent.md"
+}

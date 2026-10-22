@@ -1,0 +1,83 @@
+[
+  {
+    "type": "function",
+    "function": {
+      "name": "ask_human",
+      "description": "需要用户补充信息或做选择时，向用户提问。什么时候用：用户没给图片、图片里没有明确商品、没说场景类型或尺寸。返回要问的问题和可选项；停下来等用户回答由平台负责。",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "question": {
+            "type": "string",
+            "description": "要问用户的问题"
+          },
+          "options": {
+            "type": "array",
+            "items": { "type": "string" },
+            "description": "可选项（选填），如 [\"1:1\", \"9:16\"]"
+          }
+        },
+        "required": ["question"]
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "remove_background",
+      "description": "把商品图的背景去掉，只留下商品。什么时候用：识别出商品之后、生成场景图之前。返回抠图后的图片路径。",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "image_path": {
+            "type": "string",
+            "description": "商品图路径（相对项目根目录），如 样图/产品.jpg"
+          }
+        },
+        "required": ["image_path"]
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "caption_image",
+      "description": "看图识别商品。什么时候用：拿到用户图片后第一步调用。判断有没有明确的商品主体，描述品类、外观、颜色、材质、用途，忽略文字和背景。",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "image_path": {
+            "type": "string",
+            "description": "商品图路径（相对项目根目录），如 样图/产品.jpg"
+          }
+        },
+        "required": ["image_path"]
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "generate_scene_image",
+      "description": "把抠好的商品放进一个场景，生成一张新图。什么时候用：每条场景方案调用一次，商品外观要保持不变。",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "image_path": {
+            "type": "string",
+            "description": "抠好背景的商品图路径（相对项目根目录），如 输出/产品_抠图_xxx.png"
+          },
+          "prompt": {
+            "type": "string",
+            "description": "中文或英文生图提示词，描述场景、光线、氛围，突出商品本身并保持参考图外观"
+          },
+          "aspect_ratio": {
+            "type": "string",
+            "description": "图片比例，可选 1:1 / 3:4 / 4:3 / 9:16 / 16:9，默认 1:1"
+          }
+        },
+        "required": ["image_path", "prompt"]
+      }
+    }
+  }
+]

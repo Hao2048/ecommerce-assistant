@@ -1,0 +1,17 @@
+{
+  "name": "product_scene_design_agent",
+  "description": "具备规划能力的产品摄影大师：识别商品→规划多场景拍摄方案→与用户确认→备好抠图素材，交给下游 Agent 生图",
+  "modelName": "deepseek-flash",
+  "system_prompt_file": "prompts/product_scene_design_agent.md",
+  "functionNames": [
+    "caption_image",
+    "remove_background",
+    "ask_human"
+  ],
+  "mcpServerList": {},
+  "contextOutputMode": "full",
+  "hierarchies": [
+    "psd_proposal_agent",
+    "psd_generate_agent"
+  ]
+}

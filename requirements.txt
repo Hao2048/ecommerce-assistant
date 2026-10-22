@@ -1,0 +1,9 @@
+# DeepSeek 对话 / 看图（OpenAI 兼容协议）
+openai>=1.40.0
+# HTTP 请求（Pixian 分割等 REST 接口）
+requests>=2.31.0
+httpx>=0.28.1,<1
+# 图片读取与处理
+Pillow>=10.0.0
+# 搭建面板
+streamlit>=1.50.0,<2

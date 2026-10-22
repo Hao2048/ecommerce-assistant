@@ -1,0 +1,10 @@
+{
+  "name": "psd_proposal_agent",
+  "description": "产品视觉方案师：把商品信息与已确认需求变成含8维度关键词组的结构化设计方案（纯思考，不调工具）",
+  "modelName": "deepseek-flash",
+  "functionNames": [],
+  "mcpServerList": {},
+  "contextOutputMode": "full",
+  "hierarchies": [],
+  "system_prompt_file": "prompts/psd_proposal_agent.md"
+}
