@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256" fill="none">
+  <title>Ecommerce Assistant</title>
+  <desc>A product bag inside a viewfinder, connected to three collaborating agents.</desc>
+  <rect x="8" y="8" width="240" height="240" rx="56" fill="#142A4A"/>
+  <path d="M47 94V64a17 17 0 0 1 17-17h30M162 47h30a17 17 0 0 1 17 17v30M47 150v28a17 17 0 0 0 17 17h17M209 150v28a17 17 0 0 1-17 17h-17" stroke="#6FAFFF" stroke-width="8" stroke-linecap="round"/>
+  <path d="M86 98h84l7 66a10 10 0 0 1-10 11H89a10 10 0 0 1-10-11l7-66Z" fill="#F7FAFF"/>
+  <path d="M108 102V87a20 20 0 0 1 40 0v15" stroke="#F7FAFF" stroke-width="9" stroke-linecap="round"/>
+  <path d="m113 133 10 10 21-22" stroke="#176BE8" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M101 205h54" stroke="#6FAFFF" stroke-width="5"/>
+  <circle cx="98" cy="205" r="7" fill="#6FAFFF"/>
+  <circle cx="128" cy="205" r="9" fill="#F7FAFF"/>
+  <circle cx="158" cy="205" r="7" fill="#6FAFFF"/>
+</svg>

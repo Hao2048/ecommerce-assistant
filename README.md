@@ -1,24 +1,54 @@
-# Ecommerce Assistant · 电商助手
+<p align="center">
+  <img src="docs/images/logo.svg" alt="电商助手图标：取景框中的商品购物袋与三个协作节点" width="112" height="112">
+</p>
 
-用一个能实际运行的商品场景图项目，学习 **多 Agent 如何分工、调用工具、移交任务，以及在失败后继续工作**。
+<h1 align="center">电商助手 · Ecommerce Assistant</h1>
 
-上传一张商品图片，用对话确认场景、数量和比例，主 Agent 协调方案设计与图片生成，最终返回可下载的场景图。项目重点是让流程可读、可改、可验证，适合学习 Python、LLM 工具调用和多 Agent 编排。
+<p align="center"><strong>让商品走进场景，让多 Agent 流程看得见。</strong></p>
 
-**公开源码 · 非商用学习项目 · Python + Streamlit**
+<p align="center">
+  多 Agent 学习 · 对话确认需求 · 商品场景图生成<br>
+  Python + Streamlit · DeepSeek + Seedream · 非商用学习项目
+</p>
+
+<p align="center">
+  <a href="#preview">界面预览</a> ·
+  <a href="#quickstart">安装与启动</a> ·
+  <a href="#workflow">多 Agent 流程</a> ·
+  <a href="#source">代码导读</a> ·
+  <a href="#practice">动手扩展</a> ·
+  <a href="#license">使用许可</a>
+</p>
+
+---
+
+上传一张商品图，用对话确认场景、数量和比例，主 Agent 协调方案设计与图片生成，最终交付可预览、可下载的场景图。
+
+这是一个面向 **Python、LLM 工具调用与多 Agent 编排学习者**的可运行项目。你可以从配置界面开始，逐步理解角色分工、工具权限、任务移交与失败恢复。
+
+| 你想做什么 | 从这里开始 |
+| --- | --- |
+| 先体验商品图生成 | [安装与启动](#quickstart)，再跑一个最小例子 |
+| 理解多个 Agent 如何配合 | [多 Agent 流程](#workflow)与[运行时说明](#runtime) |
+| 修改提示词、工具或角色 | [Agent 配置界面](#agent-config)、[代码导读](#source)与[扩展练习](#practice) |
+
+<a id="preview"></a>
 
 ## 界面与运行结果
 
-以下图片展示项目的 Agent 配置界面、商品图工作室与生成结果。
+### 商品图工作室
+
+从上传商品到预览与下载，在同一段对话里完成。处理进度可查看，失败任务可单独补做。
+
+![商品图工作室界面](docs/images/studio-ui.png)
+
+<a id="agent-config"></a>
 
 ### Agent 搭建配置
 
-在「搭建配置」页面，可以选择主 Agent 模型、挂载工具、编辑系统提示词，并管理子 Agent 与移交关系。学习时可以对照下方的流程图，观察配置如何决定各角色的职责与工具权限。
+选择主 Agent 模型、挂载工具、编辑系统提示词，并管理子 Agent 与移交关系。对照[流程图](#workflow)，观察配置如何决定各角色的职责与工具权限。
 
 ![Agent 搭建配置界面](docs/images/agent-config.png)
-
-### 商品图工作室
-
-![商品图工作室界面](docs/images/studio-ui.png)
 
 ### 商品场景图示例
 
@@ -28,62 +58,9 @@
 
 这张示例由 Seedream 5.0 Flash 基于商品参考图生成。生成结果具有随机性，单张示例不代表所有商品的效果。
 
-## 先理解这条多 Agent 流程
+<a id="quickstart"></a>
 
-```mermaid
-flowchart TD
-    U[用户上传商品图片并描述需求] --> M[主 Agent：理解需求与编排]
-    M --> C[caption_image：识别商品]
-    C --> D{商品与需求是否明确}
-    D -- 否 --> H[ask_human：提问并暂停]
-    H --> A[用户补充信息]
-    A --> M
-    D -- 是 --> B{是否需要去除复杂背景}
-    B -- 是 --> R[remove_background：Pixian 抠图]
-    B -- 否 --> P[方案 Agent：设计拍摄方案]
-    R --> P
-    P --> G[生成 Agent：撰写提示词并执行]
-    G --> I[generate_scene_image：Seedream 图生图]
-    I --> O[最终场景图：预览与下载]
-    I -- 部分失败 --> F[保留成功产物并记录失败任务]
-    F --> T[用户选择补图：仅重试失败任务]
-    T --> I
-```
-
-这里的 Agent 不是三个不同品牌的大模型，而是**配置、提示词、工具权限和上下文不同的三个角色**。当前三个角色都使用 `deepseek-flash`；真正生成图片的是独立的 Seedream 图像模型。
-
-| 角色 | 负责什么 | 可以使用什么 |
-| --- | --- | --- |
-| 主 Agent `product_scene_design_agent` | 识别商品、确认需求、处理背景、协调子 Agent | 看图、抠图、提问，以及两个移交工具 |
-| 方案 Agent `psd_proposal_agent` | 将商品信息与用户需求变成拍摄方案 | 纯文本生成，不挂载图片工具 |
-| 生成 Agent `psd_generate_agent` | 将方案写成具体提示词，逐张生成图片 | 仅 `generate_scene_image` |
-
-## 运行时是怎样工作的
-
-主流程在 [engine.py](src/engine.py)，可以按下面的顺序阅读。
-
-1. **读取角色配置。** 从 `agents/<name>.json` 加载模型、提示词、工具和下属 Agent；提示词可以独立放在 `prompts/`。
-2. **组装工具说明书。** `config/tool_list.json` 告诉模型每个工具的用途、参数和必填项。挂载工具不等于已经执行工具。
-3. **让模型决定下一步。** 模型可以直接回复，也可以返回一个或多个 `tool_calls`。Python 运行时验证权限、解析参数，再执行实际函数。
-4. **把工具结果写回上下文。** 每个工具调用都有对应的 `tool_call_id` 和结果消息。工具失败也是结构化结果，不能丢失，否则下一轮接口可能拒绝对话记录。
-5. **通过移交工具调用子 Agent。** `hierarchies` 会自动变成 `handoff_to_<name>`。子 Agent 使用自己的提示词和权限，返回回复及最终图片产物。
-6. **在需要用户参与时暂停。** `ask_human` 返回问题与选项，当前回合结束；用户回答后继续主流程。
-7. **按真实结果交付。** 界面只展示最终场景图，抠图保留在内部。失败图片可以单独补做，已成功的图片不会因为一次失败而丢失。
-
-工具可以一批被模型提出，但当前执行器按顺序处理，**没有实现并行 Agent 或并行生图**。这个实现有意保持简单，方便逐步跟踪每一次调用。
-
-## 模型与服务
-
-| 环节 | 当前配置 | 配置位置 |
-| --- | --- | --- |
-| 主对话、方案设计、生图调度 | DeepSeek 官方 API，`deepseek-flash` | `agents/*.json` |
-| 商品图片识别 | `deepseek-flash` 的视觉能力 | `CAPTION_MODEL` |
-| 商品场景图生成 | 火山方舟，`doubao-seedream-5-0-flash-260915` | `IMAGE_MODEL` |
-| 去除商品背景 | Pixian API | `PIXIAN_API_ID` / `PIXIAN_API_SECRET` |
-
-DeepSeek 请求显式关闭思考模式，使用普通工具调用流程。生图每次请求输出一张图片，支持 `1:1`、`3:4`、`4:3`、`9:16`、`16:9`，并映射为明确的像素尺寸。服务的账号权限、额度和可用模型需要自行配置。
-
-## 本地启动
+## 安装与启动
 
 建议使用 Python 3.11 或更新版本。下面以 macOS / Linux 为例。
 
@@ -123,7 +100,70 @@ Windows 可以使用 `py -m venv .venv`、`.venv\Scripts\Activate.ps1` 和 `Copy
 
 建议先生成 1 张，理解完整流程后再增加数量。真实接口调用会消耗对应服务的额度。上传素材需有使用权，生成图片也应人工检查商品外观和细节。
 
-## 从哪里开始读代码
+<a id="workflow"></a>
+
+## 多 Agent 流程
+
+```mermaid
+flowchart TD
+    U[用户上传商品图片并描述需求] --> M[主 Agent：理解需求与编排]
+    M --> C[caption_image：识别商品]
+    C --> D{商品与需求是否明确}
+    D -- 否 --> H[ask_human：提问并暂停]
+    H --> A[用户补充信息]
+    A --> M
+    D -- 是 --> B{是否需要去除复杂背景}
+    B -- 是 --> R[remove_background：Pixian 抠图]
+    B -- 否 --> P[方案 Agent：设计拍摄方案]
+    R --> P
+    P --> G[生成 Agent：撰写提示词并执行]
+    G --> I[generate_scene_image：Seedream 图生图]
+    I --> O[最终场景图：预览与下载]
+    I -- 部分失败 --> F[保留成功产物并记录失败任务]
+    F --> T[用户选择补图：仅重试失败任务]
+    T --> I
+```
+
+这里的 Agent 不是三个不同品牌的大模型，而是**配置、提示词、工具权限和上下文不同的三个角色**。当前三个角色都使用 `deepseek-flash`；真正生成图片的是独立的 Seedream 图像模型。
+
+| 角色 | 负责什么 | 可以使用什么 |
+| --- | --- | --- |
+| 主 Agent `product_scene_design_agent` | 识别商品、确认需求、处理背景、协调子 Agent | 看图、抠图、提问，以及两个移交工具 |
+| 方案 Agent `psd_proposal_agent` | 将商品信息与用户需求变成拍摄方案 | 纯文本生成，不挂载图片工具 |
+| 生成 Agent `psd_generate_agent` | 将方案写成具体提示词，逐张生成图片 | 仅 `generate_scene_image` |
+
+<a id="runtime"></a>
+
+## 运行时是怎样工作的
+
+主流程在 [engine.py](src/engine.py)，可以按下面的顺序阅读。
+
+1. **读取角色配置。** 从 `agents/<name>.json` 加载模型、提示词、工具和下属 Agent；提示词可以独立放在 `prompts/`。
+2. **组装工具说明书。** `config/tool_list.json` 告诉模型每个工具的用途、参数和必填项。挂载工具不等于已经执行工具。
+3. **让模型决定下一步。** 模型可以直接回复，也可以返回一个或多个 `tool_calls`。Python 运行时验证权限、解析参数，再执行实际函数。
+4. **把工具结果写回上下文。** 每个工具调用都有对应的 `tool_call_id` 和结果消息。工具失败也是结构化结果，不能丢失，否则下一轮接口可能拒绝对话记录。
+5. **通过移交工具调用子 Agent。** `hierarchies` 会自动变成 `handoff_to_<name>`。子 Agent 使用自己的提示词和权限，返回回复及最终图片产物。
+6. **在需要用户参与时暂停。** `ask_human` 返回问题与选项，当前回合结束；用户回答后继续主流程。
+7. **按真实结果交付。** 界面只展示最终场景图，抠图保留在内部。失败图片可以单独补做，已成功的图片不会因为一次失败而丢失。
+
+工具可以一批被模型提出，但当前执行器按顺序处理，**没有实现并行 Agent 或并行生图**。这个实现有意保持简单，方便逐步跟踪每一次调用。
+
+<a id="models"></a>
+
+## 模型与服务
+
+| 环节 | 当前配置 | 配置位置 |
+| --- | --- | --- |
+| 主对话、方案设计、生图调度 | DeepSeek 官方 API，`deepseek-flash` | `agents/*.json` |
+| 商品图片识别 | `deepseek-flash` 的视觉能力 | `CAPTION_MODEL` |
+| 商品场景图生成 | 火山方舟，`doubao-seedream-5-0-flash-260915` | `IMAGE_MODEL` |
+| 去除商品背景 | Pixian API | `PIXIAN_API_ID` / `PIXIAN_API_SECRET` |
+
+DeepSeek 请求显式关闭思考模式，使用普通工具调用流程。生图每次请求输出一张图片，支持 `1:1`、`3:4`、`4:3`、`9:16`、`16:9`，并映射为明确的像素尺寸。服务的账号权限、额度和可用模型需要自行配置。
+
+<a id="source"></a>
+
+## 代码导读
 
 ```text
 README.md                       项目说明与多 Agent 教程
@@ -154,6 +194,8 @@ docs/images/                    README 使用的界面和结果图片
 
 推荐阅读顺序：`agents/product_scene_design_agent.json` → 对应提示词 → `src/engine.py` 中的 `run_agent()` → `tools/ask_human.py` → 生图工具 → `src/pages_studio.py`。
 
+<a id="practice"></a>
+
 ## 三个适合练习的扩展
 
 ### 1. 新增一个工具
@@ -174,6 +216,8 @@ docs/images/                    README 使用的界面和结果图片
 
 这个练习比一开始就增加 Agent 数量更容易帮助你理解运行时的边界。
 
+<a id="configuration"></a>
+
 ## 配置与运行文件
 
 根目录仅保留 README、忽略文件和许可证三个文件。源码位于 `src/`，配置位于 `config/`，依赖位于 `requirements/`，版权声明与展示图片位于 `docs/`。资源路径始终以项目目录为基准，上传和生成结果仍保存在项目目录下。
@@ -191,9 +235,13 @@ python -m streamlit run src/app.py
 
 「商品图工作室」的地址是 `http://localhost:8501/studio`。使用自己的商品图片即可开始，最终图片会保存在本地 `输出/` 目录。
 
+<a id="limits"></a>
+
 ## 当前边界
 
 这是本地教学项目，尚未提供用户登录、任务队列、会话数据库、并发隔离或生产部署方案。浏览器会话内保存对话，图片落在本地磁盘；多个子 Agent 按顺序执行。不要直接把当前 Streamlit 开发服务当作面向公众的生产服务。
+
+<a id="license"></a>
 
 ## 许可证：非商用源码开放
 
