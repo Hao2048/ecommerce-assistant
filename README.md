@@ -26,11 +26,15 @@
 
 这是一个面向 **Python、LLM 工具调用与多 Agent 编排学习者**的可运行项目。你可以从配置界面开始，逐步理解角色分工、工具权限、任务移交与失败恢复。
 
+<div align="center">
+
 | 你想做什么 | 从这里开始 |
 | --- | --- |
 | 先体验商品图生成 | [安装与启动](#quickstart)，再跑一个最小例子 |
 | 理解多个 Agent 如何配合 | [多 Agent 流程](#workflow)与[运行时说明](#runtime) |
 | 修改提示词、工具或角色 | [Agent 配置界面](#agent-config)、[代码导读](#source)与[扩展练习](#practice) |
+
+</div>
 
 <a id="preview"></a>
 
@@ -40,7 +44,9 @@
 
 从上传商品到预览与下载，在同一段对话里完成。处理进度可查看，失败任务可单独补做。
 
-![商品图工作室界面](docs/images/studio-ui.png)
+<p align="center">
+  <img src="docs/images/studio-ui.png" alt="商品图工作室界面">
+</p>
 
 <a id="agent-config"></a>
 
@@ -48,7 +54,9 @@
 
 选择主 Agent 模型、挂载工具、编辑系统提示词，并管理子 Agent 与移交关系。对照[流程图](#workflow)，观察配置如何决定各角色的职责与工具权限。
 
-![Agent 搭建配置界面](docs/images/agent-config.png)
+<p align="center">
+  <img src="docs/images/agent-config.png" alt="Agent 搭建配置界面">
+</p>
 
 ### 商品场景图示例
 
@@ -75,11 +83,15 @@ cp config/config.example.py config/config.py
 
 在本地 `config/config.py` 填入自己的凭证。仓库只提供**凭证为空的配置副本** [config.example.py](config/config.example.py)，不包含真实 `config/config.py`。
 
+<div align="center">
+
 | 配置项 | 用途 |
 | --- | --- |
 | `DEEPSEEK_API_KEY` | 对话、方案、工具调度与商品识别 |
 | `ARK_API_KEY` | Seedream 图片生成 |
 | `PIXIAN_API_ID` / `PIXIAN_API_SECRET` | 复杂背景商品的抠图 |
+
+</div>
 
 白底或透明背景图片可以跳过抠图；复杂背景流程需要 Pixian 凭证。填写后启动：
 
@@ -104,6 +116,8 @@ Windows 可以使用 `py -m venv .venv`、`.venv\Scripts\Activate.ps1` 和 `Copy
 
 ## 多 Agent 流程
 
+<div align="center">
+
 ```mermaid
 flowchart TD
     U[用户上传商品图片并描述需求] --> M[主 Agent：理解需求与编排]
@@ -124,13 +138,19 @@ flowchart TD
     T --> I
 ```
 
+</div>
+
 这里的 Agent 不是三个不同品牌的大模型，而是**配置、提示词、工具权限和上下文不同的三个角色**。当前三个角色都使用 `deepseek-flash`；真正生成图片的是独立的 Seedream 图像模型。
+
+<div align="center">
 
 | 角色 | 负责什么 | 可以使用什么 |
 | --- | --- | --- |
 | 主 Agent `product_scene_design_agent` | 识别商品、确认需求、处理背景、协调子 Agent | 看图、抠图、提问，以及两个移交工具 |
 | 方案 Agent `psd_proposal_agent` | 将商品信息与用户需求变成拍摄方案 | 纯文本生成，不挂载图片工具 |
 | 生成 Agent `psd_generate_agent` | 将方案写成具体提示词，逐张生成图片 | 仅 `generate_scene_image` |
+
+</div>
 
 <a id="runtime"></a>
 
@@ -152,12 +172,16 @@ flowchart TD
 
 ## 模型与服务
 
+<div align="center">
+
 | 环节 | 当前配置 | 配置位置 |
 | --- | --- | --- |
 | 主对话、方案设计、生图调度 | DeepSeek 官方 API，`deepseek-flash` | `agents/*.json` |
 | 商品图片识别 | `deepseek-flash` 的视觉能力 | `CAPTION_MODEL` |
 | 商品场景图生成 | 火山方舟，`doubao-seedream-5-0-flash-260915` | `IMAGE_MODEL` |
 | 去除商品背景 | Pixian API | `PIXIAN_API_ID` / `PIXIAN_API_SECRET` |
+
+</div>
 
 DeepSeek 请求显式关闭思考模式，使用普通工具调用流程。生图每次请求输出一张图片，支持 `1:1`、`3:4`、`4:3`、`9:16`、`16:9`，并映射为明确的像素尺寸。服务的账号权限、额度和可用模型需要自行配置。
 
