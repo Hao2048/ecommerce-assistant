@@ -1,8 +1,8 @@
 <p align="center">
-  <img src="docs/images/logo.svg" alt="电商助手图标：取景框中的商品购物袋与三个协作节点" width="112" height="112">
+  <img src="docs/images/logo.svg" alt="电商产图图标：取景框中的商品购物袋与三个协作节点" width="112" height="112">
 </p>
 
-<h1 align="center">电商助手 · Ecommerce Assistant</h1>
+<h1 align="center">电商产图</h1>
 
 <p align="center"><strong>让商品走进场景，让多 Agent 流程看得见。</strong></p>
 
@@ -40,12 +40,12 @@
 
 ## 界面与运行结果
 
-### 商品图工作室
+### 电商产图
 
 从上传商品到预览与下载，在同一段对话里完成。处理进度可查看，失败任务可单独补做。
 
 <p align="center">
-  <img src="docs/images/studio-ui.png" alt="商品图工作室界面">
+  <img src="docs/images/studio-ui.png" alt="电商产图界面">
 </p>
 
 <a id="agent-config"></a>
@@ -99,7 +99,7 @@ cp config/config.example.py config/config.py
 python -m streamlit run src/app.py
 ```
 
-打开 `http://localhost:8501`，选择顶部的「商品图工作室」进入对话；「搭建配置」用于查看和修改 Agent 模型、提示词、工具与上下级关系。
+打开 `http://localhost:8501`，选择顶部的「电商产图」进入对话；「搭建配置」用于查看和修改 Agent 模型、提示词、工具与上下级关系。
 
 Windows 可以使用 `py -m venv .venv`、`.venv\Scripts\Activate.ps1` 和 `Copy-Item config/config.example.py config/config.py`，其余 Python 命令相同。
 
@@ -246,7 +246,7 @@ docs/images/                    README 使用的界面和结果图片
 
 根目录仅保留 README、忽略文件和许可证三个文件。源码位于 `src/`，配置位于 `config/`，依赖位于 `requirements/`，版权声明与展示图片位于 `docs/`。资源路径始终以项目目录为基准，上传和生成结果仍保存在项目目录下。
 
-仓库仅保留运行电商助手需要的代码、Agent 配置、提示词、空配置模板，以及 README 使用的界面与结果图片。不包含测试目录、样例输入、旧需求文档、试跑脚本或桌面启动器。
+仓库仅保留运行电商产图需要的代码、Agent 配置、提示词、空配置模板，以及 README 使用的界面与结果图片。不包含测试目录、样例输入、旧需求文档、试跑脚本或桌面启动器。
 
 `config/config.py`、`.env`、`.streamlit/secrets.toml`、`.runtime/`、用户上传及 `输出/` 不应提交。运行时会按需创建上传和输出目录，无需预先放入测试图片。
 
@@ -257,7 +257,7 @@ python -m compileall -q src tools
 python -m streamlit run src/app.py
 ```
 
-「商品图工作室」的地址是 `http://localhost:8501/studio`。使用自己的商品图片即可开始，最终图片会保存在本地 `输出/` 目录。
+「电商产图」的地址是 `http://localhost:8501/studio`。使用自己的商品图片即可开始，最终图片会保存在本地 `输出/` 目录。
 
 <a id="limits"></a>
 

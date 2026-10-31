@@ -1,5 +1,5 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256" fill="none">
-  <title>Ecommerce Assistant</title>
+  <title>电商产图</title>
   <desc>A product bag inside a viewfinder, connected to three collaborating agents.</desc>
   <rect x="8" y="8" width="240" height="240" rx="56" fill="#142A4A"/>
   <path d="M47 94V64a17 17 0 0 1 17-17h30M162 47h30a17 17 0 0 1 17 17v30M47 150v28a17 17 0 0 0 17 17h17M209 150v28a17 17 0 0 1-17 17h-17" stroke="#6FAFFF" stroke-width="8" stroke-linecap="round"/>

@@ -93,7 +93,7 @@ if st.session_state.get('diagnosed_history_length') != len(st.session_state.agen
     st.session_state.diagnosed_history_length = len(st.session_state.agent_messages)
 st.markdown(PAGE_CSS, unsafe_allow_html=True)
 with st.sidebar:
-    st.title('商品图工作室')
+    st.title('电商产图')
     st.caption('从一张商品图，开始一组场景创作。')
     if st.button('开始新对话', icon=':material/add:', width='stretch'):
         for key in ('messages', 'agent_messages'):
